@@ -7,14 +7,16 @@ using TMPro; // used to import text mesh pro package
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+public static class globalVars {
+    public static bool initiateSound = false;
+}
 
 public class bootUpOS : MonoBehaviour
 {
     public Slider loadingBar;
     public GameObject screenContents;
     public RawImage nextScreen;
-    //public AudioClip soundSource;
-    public AudioSource startingSound;
+    
 
     GameObject logo1;
     GameObject title;
@@ -39,6 +41,8 @@ public class bootUpOS : MonoBehaviour
     bool doneLoading = false; // used so the fade transition doesn't repeat itself
 
     float elapsedTime = 0;
+
+    
     
     // Start is called before the first frame update
     void Start()
@@ -214,9 +218,7 @@ public class bootUpOS : MonoBehaviour
                 } else if (elapsedTime >= 5 && elapsedTime < 10) {
                     elapsedTime += Time.deltaTime;
                     nextScreen.enabled = true;
-                    //startingSound.clip = soundSource;
-                    startingSound.Play();
-                    Debug.Log(startingSound.isPlaying);
+                    globalVars.initiateSound = true;
                 } else {
                     SceneManager.LoadScene("MainScene");
                 }
