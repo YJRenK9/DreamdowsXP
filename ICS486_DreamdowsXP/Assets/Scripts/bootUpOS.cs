@@ -16,6 +16,7 @@ public class bootUpOS : MonoBehaviour
     public Slider loadingBar;
     public GameObject screenContents;
     public RawImage nextScreen;
+    public AudioSource theAudio;
     
 
     GameObject logo1;
@@ -40,7 +41,7 @@ public class bootUpOS : MonoBehaviour
 
     bool doneLoading = false; // used so the fade transition doesn't repeat itself
 
-    float elapsedTime = 0;
+    //float elapsedTime = 0;
 
     
     
@@ -110,8 +111,16 @@ public class bootUpOS : MonoBehaviour
 
         nextScreen.enabled = false;
 
+        // In this case, must play the sound in the start/setup function (so program will realize the user wants to play the sound, but not just yet)
+        theAudio.Play();
+
         // used to get the component for the auido clip
         //startingSound = GetComponent<AudioSource>();
+        
+        // putting the coroutine in Start() would start it right after you run the scene (not good if you want to start it at a certain time)
+        //StartCoroutine("ActivateWelcomeScreen");
+
+        // won't use StopCoroutine() in Start() as the coroutine will stop automatically after it finished
     }
 
 
@@ -162,7 +171,9 @@ public class bootUpOS : MonoBehaviour
                     //Debug.Log(i.color.a);
                 }
                 //Debug.Log(showUI[n]);
-            } 
+            }
+            // pauses the sound in update function
+            theAudio.Pause(); 
         } else {
             // used to not loop through the UI elements fading
             doneLoading = true;
@@ -211,17 +222,10 @@ public class bootUpOS : MonoBehaviour
                     }
                     //Debug.Log(showUI[n]);
                 }
-
-                // around 5 seconds
-                if (elapsedTime < 5) {
-                    elapsedTime += Time.deltaTime;
-                } else if (elapsedTime >= 5 && elapsedTime < 10) {
-                    elapsedTime += Time.deltaTime;
-                    nextScreen.enabled = true;
-                    globalVars.initiateSound = true;
-                } else {
-                    SceneManager.LoadScene("MainScene");
-                }
+                // starts the coroutine right after the UI elements become invisible (again)
+                StartCoroutine("ActivateWelcomeScreen");
+                // still gets called because StartCoroutine is still being called
+                // Debug.Log("evaded");
             }
         }
 
@@ -234,5 +238,21 @@ public class bootUpOS : MonoBehaviour
         // } else {
         //     Debug.Log("Done!");
         // }
+    }
+
+    IEnumerator ActivateWelcomeScreen() 
+    {
+        // iterate and returns seconds for five seconds
+        yield return new WaitForSeconds(5f);
+        // unhide welcome screen
+        nextScreen.enabled = true;
+        // upause will let the user hear the sound
+        theAudio.UnPause();
+        // wait for 5 more seconds
+        yield return new WaitForSeconds(5f);
+        SceneManager.LoadScene("MainScene");
+        // may be able to print a few times due to how fast Update() runs
+        // nothing gets printed into the console once the next scene is loaded
+        // Debug.Log("evaded");
     }
 }
